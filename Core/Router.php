@@ -24,6 +24,8 @@ class Router {
 	* Add a route to the routing table
 	* @param string $route - the route URL
 	* @param array $params Parameters (controller, action, etc)
+	
+	protected $params = array();
 	*
 	* @return void
 	*/	
