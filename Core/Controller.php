@@ -5,11 +5,7 @@ namespace Core;
 /**
  * Base controller
  *
-<<<<<<< HEAD
  * PHP version 5.4
-=======
- * PHP version 5.5.9
->>>>>>> f22ceed3f3cd1bcb475789310763efbd17dec766
  */
 abstract class Controller
 {
@@ -31,7 +27,6 @@ abstract class Controller
     {
         $this->route_params = $route_params;
     }
-<<<<<<< HEAD
 
     /***
     ** Using __call magic method to execute check non-existent
@@ -74,6 +69,4 @@ abstract class Controller
         {
 
         }
-=======
->>>>>>> f22ceed3f3cd1bcb475789310763efbd17dec766
 }
