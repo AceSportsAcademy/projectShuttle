@@ -1,5 +1,4 @@
-# Remove index.php from the request but maintain the query string
-
+# Remove the question mark from the request but maintain the query string
 RewriteEngine On
 RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f

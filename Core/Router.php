@@ -1,88 +1,90 @@
 <?php
 
-
-/**
-**
-* Namespace
-**/
-
 namespace Core;
+
 /**
-* Router
-*
-*/
-class Router {
+ * Router
+ *
+ * PHP version 5.4
+ */
+class Router
+{
 
-	/*
-	* Associative array of routes (the routing table)
-	* @var array
-	*/
+    /**
+     * Associative array of routes (the routing table)
+     * @var array
+     */
+    protected $routes = array();
 
-	protected $routes = array();
-	
-	/*
-	* Add a route to the routing table
-	* @param string $route - the route URL
-	* @param array $params Parameters (controller, action, etc)
-	*
-	* @return void
-	*/	
+    /**
+     * Parameters from the matched route
+     * @var array
+     */
+    protected $params = array();
 
-	public function add($route, $params = array())
-	{
-		// Convert the route to a regular expression; escape forward slashes
-		$route = preg_replace('/\//', '\\/', $route);
-		
-		// Convert variables e.g. {controller}
-		$route = preg_replace('/\{([a-z]+)\}/', '(?P<\1>[a-z-]+)', $route);
+    /**
+     * Add a route to the routing table
+     *
+     * @param string $route  The route URL
+     * @param array  $params Parameters (controller, action, etc.)
+     *
+     * @return void
+     */
+    public function add($route, $params = array())
+    {
+        // Convert the route to a regular expression: escape forward slashes
+        $route = preg_replace('/\//', '\\/', $route);
 
-		// Convert variables with custom regular expressions
-		$route = preg_replace('/\{([a-z]+):([^\}]+)\}/', '(?P<\1>\2)', $route);
+        // Convert variables e.g. {controller}
+        $route = preg_replace('/\{([a-z]+)\}/', '(?P<\1>[a-z-]+)', $route);
 
-		// Add start and end delimiters, and case insensitive flag
-		$route = '/^' . $route . '$/i';
+        // Convert variables with custom regular expressions e.g. {id:\d+}
+        $route = preg_replace('/\{([a-z]+):([^\}]+)\}/', '(?P<\1>\2)', $route);
 
-		$this->routes[$route] = $params;
-	}
+        // Add start and end delimiters, and case insensitive flag
+        $route = '/^' . $route . '$/i';
 
-	/****
-	* Get all the routes from the routing table
-	* 
-	* @return array
-	*/
+        $this->routes[$route] = $params;
+    }
 
-	public function getRoutes()
-	{
-		return $this->routes;
-	}
+    /**
+     * Get all the routes from the routing table
+     *
+     * @return array
+     */
+    public function getRoutes()
+    {
+        return $this->routes;
+    }
 
-	public function match($url)
-	{
-		// Match to the fixed URL format /controller/action
-		// $reg_exp = "/^(?P<controller>[a-z-]+)\/(?P<action>[a-z-]+)$/";
+    /**
+     * Match the route to the routes in the routing table, setting the $params
+     * property if a route is found.
+     *
+     * @param string $url The route URL
+     *
+     * @return boolean  true if a match found, false otherwise
+     */
+    public function match($url)
+    {
+        foreach ($this->routes as $route => $params) {
+            if (preg_match($route, $url, $matches)) {
+                // Get named capture group values
+                foreach ($matches as $key => $match) {
+                    if (is_string($key)) {
+                        $params[$key] = $match;
+                    }
+                }
 
-		foreach ($this->routes as $route => $params) {
-			# code...
-			if (preg_match($route, $url, $matches)){
-				//get named capture group values
-				//$params = [];
+                $this->params = $params;
+                return true;
+            }
+        }
 
-				foreach ($matches as $key => $match) {
-					# code...
-					if (is_string($key)){
-						$params[$key] = $match;
-					}
-				}
+        return false;
+    }
 
-				$this->params = $params;
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	 /**
+    /**
      * Get the currently matched parameters
      *
      * @return array
@@ -92,7 +94,7 @@ class Router {
         return $this->params;
     }
 
-     /***
+    /**
      * Dispatch the route, creating the controller object and running the
      * action method
      *
@@ -102,13 +104,13 @@ class Router {
      */
     public function dispatch($url)
     {
-
-        $url = $this->removeQueryStringVariable($url);
+        $url = $this->removeQueryStringVariables($url);
 
         if ($this->match($url)) {
             $controller = $this->params['controller'];
             $controller = $this->convertToStudlyCaps($controller);
-            $controller = "App\Controllers\\$controller";
+          //  $controller = "App\Controllers\\$controller";
+            $controller = $this->getNamespace(). $controller;
 
             if (class_exists($controller)) {
                 $controller_object = new $controller($this->params);
@@ -156,23 +158,35 @@ class Router {
         return lcfirst($this->convertToStudlyCaps($string));
     }
 
-    /****
-    * A URL of the format localhost/?page (one variable name, no value) won't
-    * work however. (NB. The .htaccess file converts the first ? to a & when
-    * it's passed through to the $_SERVER variable).
-    *
-    *@param string $url  The full URL
-    *
-    *@return sting the URL with query string variable removed
-    ****/
-
-    protected function removeQueryStringVariable($url)
+    /**
+     * Remove the query string variables from the URL (if any). As the full
+     * query string is used for the route, any variables at the end will need
+     * to be removed before the route is matched to the routing table. For
+     * example:
+     *
+     *   URL                           $_SERVER['QUERY_STRING']  Route
+     *   -------------------------------------------------------------------
+     *   localhost                     ''                        ''
+     *   localhost/?                   ''                        ''
+     *   localhost/?page=1             page=1                    ''
+     *   localhost/posts?page=1        posts&page=1              posts
+     *   localhost/posts/index         posts/index               posts/index
+     *   localhost/posts/index?page=1  posts/index&page=1        posts/index
+     *
+     * A URL of the format localhost/?page (one variable name, no value) won't
+     * work however. (NB. The .htaccess file converts the first ? to a & when
+     * it's passed through to the $_SERVER variable).
+     *
+     * @param string $url The full URL
+     *
+     * @return string The URL with the query string variables removed
+     */
+    protected function removeQueryStringVariables($url)
     {
-        if($url != ''){
+        if ($url != '') {
             $parts = explode('&', $url, 2);
 
-            if (strpos($parts[0],'=')=== false) {
-                # code...
+            if (strpos($parts[0], '=') === false) {
                 $url = $parts[0];
             } else {
                 $url = '';
@@ -182,7 +196,14 @@ class Router {
         return $url;
     }
 
+    protected function getNamespace()
+    {
+        $namespace = 'App\Controllers\\';
+
+        if(array_key_exists('namespace', $this->params)) {
+            $namespace .= $this->params['namespace'] . '\\'; 
+        }
+
+        return $namespace;
+    }
 }
-
-
-?>
