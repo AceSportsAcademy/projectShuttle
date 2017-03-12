@@ -1,22 +1,17 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Home</title>
-   
 </head>
-
 <body>
-<div>
-    <h1>Hello</h1>
-    <p>Hello <?php echo htmlspecialchars($name); ?></p>
+    <h1>Welcome</h1>
+    <p>Hello <?php echo htmlspecialchars($name); ?>!</p>
 
-   <ul>
-    	<?php foreach ($colors as $color): ?>
-    		<li><?php echo htmlspecialchars($color); ?></li>
-    	<?php endforeach; ?>
-
-    </ul> 
-
-</div>
+    <ul>
+        <?php foreach ($colours as $colour): ?>
+            <li><?php echo htmlspecialchars($colour); ?></li>
+        <?php endforeach; ?>
+    </ul>
 </body>
 </html>

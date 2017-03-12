@@ -1,11 +1,16 @@
 {% extends "base.html" %}
 
-{% block title %} Posts {% endblock %}
+{% block title %}Posts{% endblock %}
 
 {% block body %}
 
     <h1>Posts</h1>
-    <p>Hello from a Posts page {{ name }} </p>
 
+    <ul>
+        {% for post in posts %}
+            <h2>{{ post.title }}</h2>
+            <p>{{ post.content }}</p>
+        {% endfor %}
+    </ul>
 
 {% endblock %}
