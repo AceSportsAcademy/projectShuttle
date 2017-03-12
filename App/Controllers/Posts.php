@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use \Core\View;
+use App\Models\Post;
+
 /**
  * Posts controller
  *
@@ -18,10 +20,11 @@ class Posts extends \Core\Controller
      */
     public function indexAction()
     {
-        //echo 'Hello from the index action in the Posts controller!';
-        //echo '<p>Query string parameters: <pre>' .
-        //     htmlspecialchars(print_r($_GET, true)) . '</pre></p>';
-        View::renderTemplate('Posts/index.html');
+        $posts = Post::getAll();
+
+        View::renderTemplate('Posts/index.html', array(
+            'posts' => $posts
+        ));
     }
 
     /**
@@ -33,7 +36,7 @@ class Posts extends \Core\Controller
     {
         echo 'Hello from the addNew action in the Posts controller!';
     }
-
+    
     /**
      * Show the edit page
      *

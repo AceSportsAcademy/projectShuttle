@@ -12,39 +12,43 @@ use \Core\View;
 class Home extends \Core\Controller
 {
 
-		/***
-        ** Before filter 
-        ** @return void
-        **/
-        protected function before()
-        {
-        //	echo "(before) ";
-        	//return false;
-        }
-
-        /***
-        ** After filter - called after an action method
-        ** @return void
-        **/
-        protected function after()
-        {
-        //	echo " (after)";
-        }
-
-    /***
-     * Show the index page
-     *
+    /**
+     * Before filter
      *
      * @return void
      */
-    /**** public function indexAction()
+    protected function before()
     {
-        //echo 'Hello from the index action in the Home controller!';
-        View::render('Home/index.php', array('name'=>'Dave', 'colors'=> array('red', 'green', 'blue')));
-    }  ****/
+        //echo "(before) ";
+        //return false;
+    }
 
+    /**
+     * After filter
+     *
+     * @return void
+     */
+    protected function after()
+    {
+        //echo " (after)";
+    }
+
+    /**
+     * Show the index page
+     *
+     * @return void
+     */
     public function indexAction()
     {
-        View::renderTemplate('Home/index.html', array('name'=>'Prashanth', 'colors'=> array('red', 'green', 'blue')));
+        /*
+        View::render('Home/index.php', [
+            'name'    => 'Dave',
+            'colours' => ['red', 'green', 'blue']
+        ]);
+        */
+        View::renderTemplate('Home/index.html', array(
+            'name'    => 'Pachha',
+            'colours' => array('red', 'green', 'blue')
+        ));
     }
 }
