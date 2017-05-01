@@ -5,7 +5,7 @@ namespace Core;
 /**
  * Router
  *
- * PHP version 5.4
+ * PHP version 7.0
  */
 class Router
 {
@@ -14,13 +14,13 @@ class Router
      * Associative array of routes (the routing table)
      * @var array
      */
-    protected $routes = array();
+    protected $routes = [];
 
     /**
      * Parameters from the matched route
      * @var array
      */
-    protected $params = array();
+    protected $params = [];
 
     /**
      * Add a route to the routing table
@@ -30,7 +30,7 @@ class Router
      *
      * @return void
      */
-    public function add($route, $params = array())
+    public function add($route, $params = [])
     {
         // Convert the route to a regular expression: escape forward slashes
         $route = preg_replace('/\//', '\\/', $route);
@@ -109,7 +109,6 @@ class Router
         if ($this->match($url)) {
             $controller = $this->params['controller'];
             $controller = $this->convertToStudlyCaps($controller);
-            //$controller = "App\Controllers\\$controller";
             $controller = $this->getNamespace() . $controller;
 
             if (class_exists($controller)) {
@@ -118,17 +117,17 @@ class Router
                 $action = $this->params['action'];
                 $action = $this->convertToCamelCase($action);
 
-                if (is_callable(array($controller_object, $action))) {
+                if (is_callable([$controller_object, $action])) {
                     $controller_object->$action();
 
                 } else {
-                    echo "Method $action (in controller $controller) not found";
+                    throw new \Exception("Method $action (in controller $controller) not found");
                 }
             } else {
-                echo "Controller class $controller not found";
+                throw new \Exception("Controller class $controller not found");
             }
         } else {
-            echo 'No route matched.';
+            throw new \Exception('No route matched.', 404);
         }
     }
 

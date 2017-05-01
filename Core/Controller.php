@@ -2,10 +2,13 @@
 
 namespace Core;
 
+
+use \App\Auth;
+use \App\Flash;
 /**
  * Base controller
  *
- * PHP version 5.4
+ * PHP version 7.0
  */
 abstract class Controller
 {
@@ -14,7 +17,7 @@ abstract class Controller
      * Parameters from the matched route
      * @var array
      */
-    protected $route_params = array();
+    protected $route_params = [];
 
     /**
      * Class constructor
@@ -45,11 +48,11 @@ abstract class Controller
 
         if (method_exists($this, $method)) {
             if ($this->before() !== false) {
-                call_user_func_array(array($this, $method), $args);
+                call_user_func_array([$this, $method], $args);
                 $this->after();
             }
         } else {
-            echo "Method $method not found in controller " . get_class($this);
+            throw new \Exception("Method $method not found in controller " . get_class($this));
         }
     }
 
@@ -69,5 +72,38 @@ abstract class Controller
      */
     protected function after()
     {
+    }
+
+    /**
+     * Redirect to a different page
+     * @param string $url URL
+     * @return void
+     */
+    public function redirect($url)
+    {
+
+        header('Location: http://'. $_SERVER['HTTP_HOST'] . $url, true, 303);
+        exit;
+
+    }
+
+    /**
+     * Require the user to be logged in before giving access to any page
+     * Remember requested password for later, then redirect to the login page
+     * @return void
+     */
+    public function requireLogin()
+    {
+
+        if(! Auth::getUser()){
+
+            Flash::addMessage('Please login to view this page', Flash::INFO);
+
+            Auth::rememberRequestedPage();
+            
+            $this->redirect('/login');
+        }
+
+
     }
 }

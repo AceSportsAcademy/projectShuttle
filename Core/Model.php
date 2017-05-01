@@ -2,48 +2,34 @@
 
 namespace Core;
 
-
 use PDO;
 use App\Config;
 
-/***
- * Use base model
+/**
+ * Base model
  *
- * PHP version 5.6
+ * PHP version 7.0
  */
-
 abstract class Model
 {
-	/***
-	 * Get PDO Database connection
-	 *
-	 * @return mixed
-	 */
 
-	protected static function getDB()
-	{
-		static $db = null;
+    /**
+     * Get the PDO database connection
+     *
+     * @return mixed
+     */
+    protected static function getDB()
+    {
+        static $db = null;
 
-		if ($db === null){
-			//	$host = '127.0.0.1';
-			//	$dbname = 'mvc';
-			//	$username = 'root';
-			//	$password = 'NEW-ROOT-PASSWORD';
+        if ($db === null) {
+            $dsn = 'mysql:host=' . Config::DB_HOST . ';dbname=' . Config::DB_NAME . ';charset=utf8';
+            $db = new PDO($dsn, Config::DB_USER, Config::DB_PASSWORD);
 
-				try {
-				//		$db = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8",
-				//		$username, $password);
-				
-					$dsn = 'mysql:host='.Config::DB_HOST.';dbname='.Config::DB_NAME.';charset=utf8;';
+            // Throw an Exception when an error occurs
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        }
 
-					$db = new PDO($dsn, Config::DB_USER, Config::DB_PASSWORD);
-
-				} catch (PDOException $e) {
-					echo $e->getMessage();
-				}	
-		}
-
-		return $db;
-	}
-
+        return $db;
+    }
 }
