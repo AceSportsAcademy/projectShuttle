@@ -3,14 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
 </head>
 <body>
-    <nav>
-        <a href="/">Home</a> |
-        <a href="/posts/index">Posts</a>
-    </nav>
+
+    {% for message in flash_messages %}
+        <div class="alert alert-{{ message.type }}">
+          {{ message.body }}
+        </div>
+    {% endfor %}
 
     {% block body %}
     {% endblock %}
+    <script
+  	src="https://code.jquery.com/jquery-3.2.1.min.js"
+  	integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  	crossorigin="anonymous"></script>
+
+  	<script type="text/javascript"
+  	src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.min.js"></script>
+
+  	{% block footer %}
+	{% endblock %}
 </body>
 </html>
