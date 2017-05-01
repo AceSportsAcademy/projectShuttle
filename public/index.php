@@ -3,20 +3,28 @@
 /**
  * Front controller
  *
- * PHP version 5.4
+ * PHP version 7.0
  */
+
+ini_set('session.cookie_lifetime', '864000');  // ten days in seconds
 
 /**
  * Composer
  */
-require '../vendor/autoload.php';
+require dirname(__DIR__) . '/vendor/autoload.php';
 
 
 /**
- * Twig
+ * Error and Exception handling
  */
-Twig_Autoloader::register();
+error_reporting(E_ALL);
+set_error_handler('Core\Error::errorHandler');
+set_exception_handler('Core\Error::exceptionHandler');
 
+/**
+ * Session start
+ */
+session_start();
 
 /**
  * Routing
@@ -24,9 +32,9 @@ Twig_Autoloader::register();
 $router = new Core\Router();
 
 // Add the routes
-$router->add('', array('controller' => 'Home', 'action' => 'index'));
+$router->add('', ['controller' => 'Home', 'action' => 'index']);
+$router->add('login', ['controller' => 'Login', 'action' => 'new']);
+$router->add('logout', ['controller' => 'Login', 'action' => 'destroy']);
 $router->add('{controller}/{action}');
-$router->add('{controller}/{id:\d+}/{action}');
-$router->add('admin/{controller}/{action}', array('namespace' => 'Admin'));
     
 $router->dispatch($_SERVER['QUERY_STRING']);
