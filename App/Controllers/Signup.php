@@ -47,7 +47,8 @@ class Signup extends \Core\Controller
 
                 $user->sendActivationEmail();
 
-                $this->redirect('/signup/success');
+               // $this->redirect('/signup/success');
+                echo "signed up";
 
             } else {
 
